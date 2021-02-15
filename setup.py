@@ -19,6 +19,9 @@ setup(
     license="MIT",
     keywords="recreation.gov",
     url="https://github.com/hagne/recreation-gov-campsite-checker",
+    scripts=['scripts/recreation_s1', 
+             # 'scripts/hrrr_smoke2gml'
+             ],
     # install_requires = ['numpy', 'pandas', 'matplotlib', 'mpl_toolkits', 'geopy', 'netCDF4', 'magic', 'gdal'],
     # extras_require={'plotting': ['matplotlib'],
     #                 'testing': ['scipy']},

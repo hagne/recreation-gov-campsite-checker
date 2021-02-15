@@ -7,9 +7,6 @@ import os
 import time
 from itertools import count, groupby
 import recreationdotgov.settings as _rdgsettings
-from email.message import Message as _Message
-import smtplib as _smtplib
-import pathlib as _pl
 
 ### global constance ... todo: improve integration ... redefine, etc
 ISO_DATE_FORMAT_REQUEST = "%Y-%m-%dT00:00:00.000Z"
@@ -19,9 +16,7 @@ headers = {"User-Agent": UserAgent().random}
 MAIN_PAGE_ENDPOINT = "/api/camps/campgrounds/"
 ISO_DATE_FORMAT_RESPONSE = "%Y-%m-%dT00:00:00Z"
 
-
 settings = _rdgsettings.load_config()
-
 ### helper functions... todo: these are the originals ... consider rewrite
 
 def consecutive_nights(available, nights):
@@ -57,41 +52,6 @@ def send_request(url, params):
 def notify_by_text(message):
     return
 
-def notify_by_mail(subject, body):
-
-    username = settings.get('gmail','username')
-    password = settings.get('gmail','password')
-
-    fromaddr = username
-    toaddrs  = username
-
-    m = _Message()
-    m['From'] = username
-    m['To'] = username
-    m['X-Priority'] = '1'
-    m['Subject'] = subject
-    m.set_payload(body)
-    
-    server = _smtplib.SMTP('smtp.gmail.com:587')
-    server.ehlo()
-    server.starttls()
-    server.login(username,password)
-    server.sendmail(fromaddr, toaddrs, m.as_string())
-    return server.quit()
-
-def log_result(msg):   
-    dt = datetime.now().isoformat()
-    
-    p2sf = _pl.Path.home().joinpath('.recreationdotgov/log.txt')
-    
-    pre = f'============\n{dt}\n============'
-    post = '+++++++++++++\n'
-    entry = '\n'.join([pre, msg,post])
-
-    with open(p2sf, 'a') as raus:
-        raus.write(entry)
-        
-    return 
 ### classes
 class Campground(object):
     def __init__(self, id):
@@ -131,7 +91,7 @@ class CampgroundCollection(object):
     def __init__(self, campgrounds):
         self.campgrounds = campgrounds
         
-    def make_query(self, checkin_date, no_of_nights, keep_looking = False, verbose = True, notify = False, log = False):
+    def make_query(self, checkin_date, no_of_nights, keep_looking = False, verbose = True, notify = False):
         """
         check for availability
 
@@ -191,29 +151,14 @@ class CampgroundCollection(object):
             res_list.sort(key = lambda x: x['no_available'], reverse=True)
             print('')
             
-        res_msg = '\n'.join([f"{res['no_available']} {res['campground_name']} {res['url']}" for res in res_list])
-        res_numbers = [i['no_available'] for i in res_list]
-        total_sites_found = sum(res_numbers)
-        campgrounds_with_availability = [i for i in res_list if i['no_available'] > 0]
+        for res in res_list:
+            print(f"{res['no_available']} {res['campground_name']} {res['url']}")
         
-        sd = f'search: {checkin_date} + {no_of_nights} nights'
-        res_msg = '\n'.join([sd,res_msg])
-        print(res_msg)
-        
-        if log:
-            log_result(res_msg)
-            
-        if total_sites_found > 0:
+        if max([i['no_available'] for i in res_list]) > 0:
             if notify == 'sound':
                 while 1:
                     os.system('spd-say "found one"')
                     time.sleep(5)
-            elif notify == 'email':
-                res_header = f'SUCCESSFUL recreationdotgov search: {total_sites_found}/{len(campgrounds_with_availability)}'
-                notify_by_mail(res_header, res_msg)
-        #### for testing only
-        # res_header = f'SUCCESSFUL recreationdotgov search: {total_sites_found}/{len(campgrounds_with_availability)}'
-        # notify_by_mail(res_header, res_msg)
         return res_list
 
 class Query(object):

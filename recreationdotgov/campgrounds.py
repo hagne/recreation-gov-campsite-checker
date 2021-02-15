@@ -30,8 +30,8 @@ co_evens = _rcl.CampgroundCollection([co_evens_gueanella_pass,
                                       co_evens_echo_lake])
 
 #### great sand dunes
-co_great_sand_dunes = _rcl.Campground(234685)
-
+co_great_sand_dunes_pinon_flats = _rcl.Campground(234685)
+co_great_sand_dunes = _rcl.CampgroundCollection([co_great_sand_dunes_pinon_flats])
 
 ### all
 co = _rcl.CampgroundCollection(co_rmnp.campgrounds + co_indian_peaks.campgrounds + co_evens.campgrounds)
