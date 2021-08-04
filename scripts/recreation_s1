@@ -9,17 +9,9 @@ from recreationdotgov import campgrounds, recreationlab
 import sys 
 import traceback
 
-try:
-    checkin = '05/21/2021'
-    number_of_nights = 2
-    out = campgrounds.co_great_sand_dunes.make_query(checkin, number_of_nights, 
-                                    notify='email',
-                                    log = True,
-                                    keep_looking=False)
-    
-    checkin = '06/04/2021'
-    number_of_nights = 2
-    out = campgrounds.co_great_sand_dunes.make_query(checkin, number_of_nights, 
+try:    
+    checkin = '08/07/2021'
+    out = campgrounds.co.make_query(checkin, 1, 
                                     notify='email',
                                     log = True,
                                     keep_looking=False)

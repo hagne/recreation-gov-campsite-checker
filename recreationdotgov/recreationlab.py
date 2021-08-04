@@ -131,7 +131,7 @@ class CampgroundCollection(object):
     def __init__(self, campgrounds):
         self.campgrounds = campgrounds
         
-    def make_query(self, checkin_date, no_of_nights, keep_looking = False, verbose = True, notify = False, log = False):
+    def make_query(self, checkin_date, no_of_nights, keep_looking = False, verbose = False, notify = False, log = False):
         """
         check for availability
 
@@ -198,7 +198,8 @@ class CampgroundCollection(object):
         
         sd = f'search: {checkin_date} + {no_of_nights} nights'
         res_msg = '\n'.join([sd,res_msg])
-        print(res_msg)
+        if verbose:
+            print(res_msg)
         
         if log:
             log_result(res_msg)
@@ -214,7 +215,12 @@ class CampgroundCollection(object):
         #### for testing only
         # res_header = f'SUCCESSFUL recreationdotgov search: {total_sites_found}/{len(campgrounds_with_availability)}'
         # notify_by_mail(res_header, res_msg)
-        return res_list
+        
+        out = {}
+        out['res_msg'] = res_msg
+        out['res_list'] = res_list
+        # return res_list
+        return out
 
 class Query(object):
     def __init__(self, campground, checkin_date = '2020-11-01', no_of_nights = 1):
